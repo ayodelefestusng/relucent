@@ -1,0 +1,496 @@
+{% extends 'relucent/base.html' %}
+{% load relucent_tags %}
+
+{% block title %}{{ product.name }} — Relucent Clothing{% endblock %}
+{% block meta_description %}{{ product.description|truncatewords:25 }}{% endblock %}
+
+{% block content %}
+<div class="bg-white min-h-screen py-8 md:py-14" 
+     x-data="{
+         activeImage: '{{ product.primary_image_url }}',
+         selectedColorId: '{{ available_colors.0.id }}',
+         selectedSizeId: '{{ available_sizes.0.id }}',
+         selectedSizeName: '{{ available_sizes.0.name }}',
+         sizeGuideOpen: false,
+         aiFitFinderOpen: false,
+         fitHeight: 175,
+         fitWeight: 70,
+         fitPreference: 'regular',
+         fitResult: null,
+         fitLoading: false,
+         calculateFit() {
+             this.fitLoading = true;
+             fetch(`/api/ai-size-recommend/?height=${this.fitHeight}&weight=${this.fitWeight}&fit=${this.fitPreference}&gender={{ product.gender }}`)
+                 .then(r => r.json())
+                 .then(data => {
+                     this.fitLoading = false;
+                     this.fitResult = data;
+                 });
+         }
+     }">
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <!-- Breadcrumb -->
+        <nav class="flex items-center space-x-2 text-xs text-gray-400 mb-8 uppercase tracking-wider">
+            <a href="{% url 'home' %}" class="hover:text-primary">Home</a>
+            <span>/</span>
+            <a href="{% url 'product_list' %}?gender={{ product.gender }}" class="hover:text-primary">{{ product.get_gender_display }}</a>
+            <span>/</span>
+            <a href="{% url 'product_list' %}?category={{ product.category.slug }}" class="hover:text-primary">{{ product.category.name }}</a>
+            <span>/</span>
+            <span class="text-primary font-semibold truncate">{{ product.name }}</span>
+        </nav>
+
+        <!-- Main Product Split Layout -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14">
+            
+            <!-- LEFT: Product Gallery (7 Cols) -->
+            <div class="lg:col-span-7 flex flex-col-reverse md:flex-row gap-4">
+                <!-- Vertical Thumbnail Strip (Desktop) -->
+                <div class="flex md:flex-col space-x-3 md:space-x-0 md:space-y-3 overflow-x-auto md:overflow-visible hide-scrollbar flex-shrink-0">
+                    {% for img in product.images.all %}
+                        <button @click="activeImage = '{{ img.image_url }}'" 
+                                class="w-16 h-20 md:w-20 md:h-26 border-2 transition-all overflow-hidden bg-neutralBg"
+                                :class="activeImage === '{{ img.image_url }}' ? 'border-gold' : 'border-transparent hover:border-gray-300'">
+                            <img src="{{ img.image_url }}" alt="{{ product.name }}" class="w-full h-full object-cover">
+                        </button>
+                    {% endfor %}
+                </div>
+
+                <!-- Main Hero Display Image (with cursor zoom) -->
+                <div class="flex-1 relative aspect-[3/4] bg-neutralBg overflow-hidden border border-gray-100">
+                    <img :src="activeImage" alt="{{ product.name }}" 
+                         class="w-full h-full object-cover object-center transition-all duration-300">
+                    
+                    {% if product.discount_percentage > 0 %}
+                        <span class="absolute top-4 left-4 bg-primary text-white text-[10px] font-bold tracking-widest uppercase px-3 py-1.5 shadow">
+                            -{{ product.discount_percentage }}% SALE
+                        </span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- RIGHT: Product Information & Purchase Bar (5 Cols) -->
+            <div class="lg:col-span-5 flex flex-col justify-between">
+                <div>
+                    <!-- Collection Tagline -->
+                    {% if product.collection %}
+                        <span class="text-xs font-semibold tracking-[0.2em] uppercase text-gold">
+                            {{ product.collection.name }}
+                        </span>
+                    {% endif %}
+
+                    <!-- Product Title -->
+                    <h1 class="font-serif text-3xl md:text-4xl text-primary font-normal mt-2 leading-tight">
+                        {{ product.name }}
+                    </h1>
+
+                    <!-- SKU & Reviews Summary -->
+                    <div class="flex items-center space-x-4 mt-3 pb-4 border-b border-gray-100 text-xs">
+                        <span class="text-gray-400 font-mono">SKU: {{ product.sku_prefix }}</span>
+                        <span class="text-gray-300">|</span>
+                        <div class="flex items-center space-x-1 text-gold">
+                            <i data-lucide="star" class="w-3.5 h-3.5 fill-current"></i>
+                            <span class="font-bold text-primary">{{ product.rating_average }}</span>
+                            <span class="text-gray-400">({{ product.reviews.count }} Reviews)</span>
+                        </div>
+                    </div>
+
+                    <!-- Pricing -->
+                    <div class="mt-5 flex items-baseline space-x-3">
+                        {% if product.discount_price_ngn %}
+                            <span class="font-serif text-2xl md:text-3xl font-bold text-primary">
+                                {{ product.discount_price_ngn|currency_price:ACTIVE_CURRENCY }}
+                            </span>
+                            <span class="text-base text-gray-400 line-through">
+                                {{ product.price_ngn|currency_price:ACTIVE_CURRENCY }}
+                            </span>
+                            <span class="text-xs text-red-600 font-semibold uppercase tracking-wider">
+                                Save {{ product.discount_percentage }}%
+                            </span>
+                        {% else %}
+                            <span class="font-serif text-2xl md:text-3xl font-bold text-primary">
+                                {{ product.price_ngn|currency_price:ACTIVE_CURRENCY }}
+                            </span>
+                        {% endif %}
+                    </div>
+                    <p class="text-[11px] text-gray-400 mt-1">Complimentary luxury gift packaging & garment sleeve included.</p>
+
+                    <!-- Add to Bag Form -->
+                    <form action="{% url 'cart_add' %}" method="POST" class="mt-8 space-y-6">
+                        {% csrf_token %}
+                        <input type="hidden" name="product_id" value="{{ product.id }}">
+
+                        <!-- Color Swatches -->
+                        <div>
+                            <div class="flex items-center justify-between text-xs mb-3">
+                                <span class="uppercase tracking-wider font-semibold text-primary">Color:</span>
+                                <span class="text-luxuryGray" id="selected-color-name">{{ available_colors.0.name }}</span>
+                            </div>
+                            <div class="flex items-center space-x-3">
+                                {% for c in available_colors %}
+                                    <label class="cursor-pointer group relative">
+                                        <input type="radio" name="color_id" value="{{ c.id }}" class="sr-only" 
+                                               {% if forloop.first %}checked{% endif %}
+                                               @click="selectedColorId = '{{ c.id }}'; document.getElementById('selected-color-name').innerText = '{{ c.name }}'">
+                                        <span class="w-8 h-8 rounded-full border-2 block p-0.5 transition-all"
+                                              :class="selectedColorId == '{{ c.id }}' ? 'border-primary ring-2 ring-gold' : 'border-gray-200'">
+                                            <span class="w-full h-full rounded-full block border border-gray-300" style="background-color: {{ c.hex_code }};"></span>
+                                        </span>
+                                    </label>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <!-- Size Selector -->
+                        <div>
+                            <div class="flex items-center justify-between text-xs mb-3">
+                                <span class="uppercase tracking-wider font-semibold text-primary">Select Size:</span>
+                                <div class="flex items-center space-x-3">
+                                    <button type="button" @click="aiFitFinderOpen = true" class="text-gold font-semibold hover:underline flex items-center space-x-1">
+                                        <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+                                        <span>AI FitFinder</span>
+                                    </button>
+                                    <span class="text-gray-300">•</span>
+                                    <button type="button" @click="sizeGuideOpen = true" class="text-gray-500 hover:text-primary underline">
+                                        Size Guide
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-5 gap-2.5">
+                                {% for s in available_sizes %}
+                                    <label class="cursor-pointer">
+                                        <input type="radio" name="size_id" value="{{ s.id }}" class="sr-only"
+                                               {% if forloop.first %}checked{% endif %}
+                                               @click="selectedSizeId = '{{ s.id }}'; selectedSizeName = '{{ s.name }}'">
+                                        <span class="py-3 block text-center text-xs font-semibold uppercase tracking-wider border transition-all"
+                                              :class="selectedSizeId == '{{ s.id }}' ? 'bg-primary text-white border-primary' : 'bg-white text-primary border-gray-300 hover:border-gold'">
+                                            {{ s.name }}
+                                        </span>
+                                    </label>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <!-- Add to Bag CTA Button -->
+                        <div class="pt-4 space-y-3">
+                            <button type="submit" 
+                                    class="w-full py-4 bg-primary text-white text-xs font-semibold tracking-[0.2em] uppercase hover:bg-gold transition-all duration-300 shadow-xl flex items-center justify-center space-x-2">
+                                <i data-lucide="shopping-bag" class="w-4 h-4"></i>
+                                <span>Add to Shopping Bag</span>
+                            </button>
+
+                            <button type="button" onclick="toggleWishlist(this, {{ product.id }})" 
+                                    class="w-full py-3 bg-white border border-gray-300 text-primary text-xs font-semibold tracking-wider uppercase hover:border-gold transition-colors flex items-center justify-center space-x-2">
+                                <i data-lucide="heart" class="w-4 h-4"></i>
+                                <span>Save to Wishlist</span>
+                            </button>
+                        </div>
+                    </form>
+
+                    <!-- Delivery & Concierge Fast Facts -->
+                    <div class="mt-8 pt-6 border-t border-gray-200 space-y-3 text-xs text-luxuryGray">
+                        <div class="flex items-center space-x-3">
+                            <i data-lucide="truck" class="w-4 h-4 text-gold flex-shrink-0"></i>
+                            <span><strong>Nigeria Delivery:</strong> 1-2 Business Days via DHL Express / Lagos Same-Day</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <i data-lucide="plane" class="w-4 h-4 text-gold flex-shrink-0"></i>
+                            <span><strong>UK, US & Europe:</strong> 3-5 Business Days via DHL Worldwide Priority</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <i data-lucide="rotate-ccw" class="w-4 h-4 text-gold flex-shrink-0"></i>
+                            <span><strong>Effortless Returns:</strong> 14 days complimentary exchange & store credit</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product Accordion Information -->
+                <div class="mt-10 border-t border-gray-200 divide-y divide-gray-200 text-xs">
+                    <div class="py-4" x-data="{ open: true }">
+                        <button @click="open = !open" class="flex items-center justify-between w-full font-serif text-sm uppercase tracking-wider text-primary">
+                            <span>The Silhouette & Story</span>
+                            <i data-lucide="chevron-down" class="w-4 h-4 transition-transform" :class="open ? 'rotate-180' : ''"></i>
+                        </button>
+                        <div x-show="open" class="mt-3 text-luxuryGray leading-relaxed font-light space-y-2">
+                            <p>{{ product.description }}</p>
+                            {% if product.fit_notes %}
+                                <p class="text-primary font-medium mt-2"><strong>Fit Advice:</strong> {{ product.fit_notes }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="py-4" x-data="{ open: false }">
+                        <button @click="open = !open" class="flex items-center justify-between w-full font-serif text-sm uppercase tracking-wider text-primary">
+                            <span>Fabric Composition & Care</span>
+                            <i data-lucide="chevron-down" class="w-4 h-4 transition-transform" :class="open ? 'rotate-180' : ''"></i>
+                        </button>
+                        <div x-show="open" class="mt-3 text-luxuryGray leading-relaxed font-light">
+                            <p>{{ product.fabric_care|default:"100% Premium Mulberry Silk / Fine Wool. Specialized dry clean only to maintain fiber luster and drape." }}</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- STICKY MOBILE BOTTOM BAR (High Conversion Feature) -->
+        <div class="lg:hidden fixed bottom-14 inset-x-0 bg-white/95 backdrop-blur-md border-t border-gray-200 p-3 z-20 shadow-2xl flex items-center justify-between">
+            <div>
+                <span class="block text-[11px] text-gray-400 font-serif line-clamp-1">{{ product.name }}</span>
+                <span class="font-bold text-primary text-sm">
+                    {% if product.discount_price_ngn %}
+                        {{ product.discount_price_ngn|currency_price:ACTIVE_CURRENCY }}
+                    {% else %}
+                        {{ product.price_ngn|currency_price:ACTIVE_CURRENCY }}
+                    {% endif %}
+                </span>
+            </div>
+            <form action="{% url 'cart_add' %}" method="POST" class="flex-shrink-0">
+                {% csrf_token %}
+                <input type="hidden" name="product_id" value="{{ product.id }}">
+                <button type="submit" class="px-6 py-2.5 bg-primary text-white text-xs font-semibold tracking-widest uppercase hover:bg-gold transition-colors">
+                    Add to Bag
+                </button>
+            </form>
+        </div>
+
+        <!-- COMPLETE THE LOOK / CROSS-SELL SECTION -->
+        {% if complete_look %}
+        <section class="mt-24 pt-16 border-t border-gray-200">
+            <div class="flex items-center justify-between mb-8">
+                <div>
+                    <span class="text-xs font-semibold tracking-[0.2em] text-gold uppercase">Curated Styling</span>
+                    <h2 class="font-serif text-2xl md:text-3xl text-primary mt-1">Complete The Look</h2>
+                </div>
+            </div>
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-6">
+                {% for item in complete_look %}
+                    {% include 'relucent/partials/product_card.html' with product=item %}
+                {% endfor %}
+            </div>
+        </section>
+        {% endif %}
+
+        <!-- VERIFIED REVIEWS SECTION -->
+        <section class="mt-24 pt-16 border-t border-gray-200">
+            <div class="max-w-4xl mx-auto">
+                <div class="text-center mb-12">
+                    <span class="text-xs font-semibold tracking-[0.2em] text-gold uppercase">Client Feedback</span>
+                    <h2 class="font-serif text-3xl text-primary mt-1">Verified Patron Reviews</h2>
+                    <p class="text-xs text-luxuryGray mt-2">Authentic reviews from verified owners across Lagos, London & New York.</p>
+                </div>
+
+                <!-- Review Form -->
+                <div class="p-8 bg-neutralBg border border-gray-200 mb-12">
+                    <h3 class="font-serif text-lg text-primary mb-4">Leave Your Impression</h3>
+                    <form action="{% url 'submit_review' product.slug %}" method="POST" class="space-y-4">
+                        {% csrf_token %}
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs uppercase tracking-wider text-gray-600 mb-1">Your Name</label>
+                                <input type="text" name="customer_name" required class="w-full px-4 py-2.5 bg-white border border-gray-300 text-xs focus:border-gold">
+                            </div>
+                            <div>
+                                <label class="block text-xs uppercase tracking-wider text-gray-600 mb-1">Your Email</label>
+                                <input type="email" name="customer_email" required class="w-full px-4 py-2.5 bg-white border border-gray-300 text-xs focus:border-gold">
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs uppercase tracking-wider text-gray-600 mb-1">Star Rating</label>
+                                <select name="rating" class="w-full px-4 py-2.5 bg-white border border-gray-300 text-xs focus:border-gold">
+                                    <option value="5">★★★★★ (5/5 Exquisite)</option>
+                                    <option value="4">★★★★☆ (4/5 Very Good)</option>
+                                    <option value="3">★★★☆☆ (3/5 Average)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs uppercase tracking-wider text-gray-600 mb-1">Headline</label>
+                                <input type="text" name="headline" placeholder="e.g. Impeccable tailoring and silk drape" required class="w-full px-4 py-2.5 bg-white border border-gray-300 text-xs focus:border-gold">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs uppercase tracking-wider text-gray-600 mb-1">Your Review</label>
+                            <textarea name="comment" rows="3" required class="w-full px-4 py-2.5 bg-white border border-gray-300 text-xs focus:border-gold"></textarea>
+                        </div>
+                        <button type="submit" class="px-6 py-3 bg-primary text-white text-xs font-semibold tracking-widest uppercase hover:bg-gold transition-colors">
+                            Submit Review
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Existing Reviews List -->
+                <div class="space-y-6">
+                    {% for rev in reviews %}
+                        <div class="p-6 border-b border-gray-200">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-2">
+                                    <span class="text-xs font-bold text-primary">{{ rev.customer_name }}</span>
+                                    {% if rev.verified_purchase %}
+                                        <span class="text-[10px] bg-green-100 text-green-800 px-2 py-0.5 font-semibold">Verified Buyer</span>
+                                    {% endif %}
+                                </div>
+                                <span class="text-[11px] text-gray-400">{{ rev.created_at|date:"M d, Y" }}</span>
+                            </div>
+                            <div class="flex text-gold my-2">
+                                {% for i in rev.rating|times %}
+                                    <i data-lucide="star" class="w-3.5 h-3.5 fill-current"></i>
+                                {% endfor %}
+                            </div>
+                            <h4 class="font-serif text-sm font-semibold text-primary">{{ rev.headline }}</h4>
+                            <p class="text-xs text-luxuryGray mt-1 font-light leading-relaxed">{{ rev.comment }}</p>
+                        </div>
+                    {% empty %}
+                        <p class="text-center text-xs text-gray-400 py-6">Be the premier patron to review this signature piece.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- AI FITFINDER MODAL -->
+    <div x-show="aiFitFinderOpen" x-cloak class="relative z-50">
+        <div class="fixed inset-0 bg-black/60 backdrop-blur-sm" @click="aiFitFinderOpen = false"></div>
+        <div class="fixed inset-0 flex items-center justify-center p-4">
+            <div class="bg-white max-w-lg w-full p-8 shadow-2xl relative">
+                <button @click="aiFitFinderOpen = false" class="absolute top-5 right-5 text-gray-400 hover:text-primary">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+
+                <div class="text-center mb-6">
+                    <span class="text-xs font-semibold tracking-[0.2em] text-gold uppercase flex items-center justify-center space-x-1">
+                        <i data-lucide="sparkles" class="w-4 h-4"></i>
+                        <span>Relucent FitFinder™ AI</span>
+                    </span>
+                    <h3 class="font-serif text-2xl text-primary mt-1">Discover Your Flawless Size</h3>
+                    <p class="text-xs text-luxuryGray mt-1">Eliminating guesswork with our sizing intelligence engine.</p>
+                </div>
+
+                <div class="space-y-4 text-xs">
+                    <div>
+                        <div class="flex justify-between font-semibold text-primary mb-1">
+                            <span>Height: <span x-text="fitHeight"></span> cm</span>
+                        </div>
+                        <input type="range" min="140" max="210" x-model="fitHeight" class="w-full accent-[#C9A865]">
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between font-semibold text-primary mb-1">
+                            <span>Weight: <span x-text="fitWeight"></span> kg</span>
+                        </div>
+                        <input type="range" min="40" max="150" x-model="fitWeight" class="w-full accent-[#C9A865]">
+                    </div>
+
+                    <div>
+                        <label class="block font-semibold text-primary mb-1.5">Fit Preference</label>
+                        <div class="grid grid-cols-3 gap-2">
+                            <button type="button" @click="fitPreference = 'slim'" 
+                                    class="py-2 border text-center transition-colors"
+                                    :class="fitPreference === 'slim' ? 'border-gold bg-gold/10 font-bold' : 'border-gray-300'">Slim Tailored</button>
+                            <button type="button" @click="fitPreference = 'regular'" 
+                                    class="py-2 border text-center transition-colors"
+                                    :class="fitPreference === 'regular' ? 'border-gold bg-gold/10 font-bold' : 'border-gray-300'">Classic Regular</button>
+                            <button type="button" @click="fitPreference = 'relaxed'" 
+                                    class="py-2 border text-center transition-colors"
+                                    :class="fitPreference === 'relaxed' ? 'border-gold bg-gold/10 font-bold' : 'border-gray-300'">Relaxed Slouchy</button>
+                        </div>
+                    </div>
+
+                    <button type="button" @click="calculateFit()" 
+                            class="w-full py-3.5 bg-primary text-white font-semibold uppercase tracking-widest text-xs hover:bg-gold transition-colors mt-4">
+                        <span x-show="!fitLoading">Calculate Recommended Size</span>
+                        <span x-show="fitLoading">Analyzing Atelier Measurements...</span>
+                    </button>
+
+                    <!-- Result -->
+                    <template x-if="fitResult">
+                        <div class="mt-4 p-4 bg-neutralBg border-l-4 border-gold text-center">
+                            <span class="text-[10px] text-gray-500 uppercase tracking-wider">Recommended Fit:</span>
+                            <div class="font-serif text-3xl font-bold text-primary mt-1" x-text="'Size ' + fitResult.recommended_size"></div>
+                            <p class="text-xs text-gray-600 mt-1" x-text="fitResult.message"></p>
+                            <button type="button" @click="selectedSizeName = fitResult.recommended_size; aiFitFinderOpen = false" 
+                                    class="mt-3 text-xs text-gold font-bold underline">Apply Size Selection &rarr;</button>
+                        </div>
+                    </template>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SIZE GUIDE MODAL -->
+    <div x-show="sizeGuideOpen" x-cloak class="relative z-50">
+        <div class="fixed inset-0 bg-black/60 backdrop-blur-sm" @click="sizeGuideOpen = false"></div>
+        <div class="fixed inset-0 flex items-center justify-center p-4">
+            <div class="bg-white max-w-2xl w-full p-8 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+                <button @click="sizeGuideOpen = false" class="absolute top-5 right-5 text-gray-400 hover:text-primary">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+                <h3 class="font-serif text-2xl text-primary mb-2">Relucent Sartorial Size Chart</h3>
+                <p class="text-xs text-luxuryGray mb-6">All measurements are provided in inches and centimeters. For bespoke adjustments, contact our VIP tailoring concierge.</p>
+
+                <div class="overflow-x-auto text-xs">
+                    <table class="w-full text-left border-collapse border border-gray-200">
+                        <thead class="bg-neutralBg font-semibold text-primary uppercase">
+                            <tr>
+                                <th class="p-3 border border-gray-200">Size</th>
+                                <th class="p-3 border border-gray-200">UK/Nigeria</th>
+                                <th class="p-3 border border-gray-200">US</th>
+                                <th class="p-3 border border-gray-200">Bust (in)</th>
+                                <th class="p-3 border border-gray-200">Waist (in)</th>
+                                <th class="p-3 border border-gray-200">Hips (in)</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200">
+                            <tr><td class="p-3 border border-gray-200 font-bold">XS</td><td class="p-3 border border-gray-200">6</td><td class="p-3 border border-gray-200">2</td><td class="p-3 border border-gray-200">31-32</td><td class="p-3 border border-gray-200">24-25</td><td class="p-3 border border-gray-200">34-35</td></tr>
+                            <tr><td class="p-3 border border-gray-200 font-bold">S</td><td class="p-3 border border-gray-200">8 - 10</td><td class="p-3 border border-gray-200">4 - 6</td><td class="p-3 border border-gray-200">33-35</td><td class="p-3 border border-gray-200">26-28</td><td class="p-3 border border-gray-200">36-38</td></tr>
+                            <tr><td class="p-3 border border-gray-200 font-bold">M</td><td class="p-3 border border-gray-200">12</td><td class="p-3 border border-gray-200">8</td><td class="p-3 border border-gray-200">36-38</td><td class="p-3 border border-gray-200">29-31</td><td class="p-3 border border-gray-200">39-41</td></tr>
+                            <tr><td class="p-3 border border-gray-200 font-bold">L</td><td class="p-3 border border-gray-200">14</td><td class="p-3 border border-gray-200">10</td><td class="p-3 border border-gray-200">39-41</td><td class="p-3 border border-gray-200">32-34</td><td class="p-3 border border-gray-200">42-44</td></tr>
+                            <tr><td class="p-3 border border-gray-200 font-bold">XL</td><td class="p-3 border border-gray-200">16</td><td class="p-3 border border-gray-200">12</td><td class="p-3 border border-gray-200">42-44</td><td class="p-3 border border-gray-200">35-37</td><td class="p-3 border border-gray-200">45-47</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    function toggleWishlist(btn, productId) {
+        fetch(`/wishlist/toggle/${productId}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                const icon = btn.querySelector('svg') || btn.querySelector('i');
+                if (data.is_wishlisted) {
+                    btn.classList.add('text-gold');
+                    btn.innerHTML = '<i data-lucide="heart" class="w-4 h-4 fill-current text-gold"></i><span>Saved to Wishlist</span>';
+                } else {
+                    btn.classList.remove('text-gold');
+                    btn.innerHTML = '<i data-lucide="heart" class="w-4 h-4"></i><span>Save to Wishlist</span>';
+                }
+                lucide.createIcons();
+
+                const badge = document.getElementById('wishlist-badge');
+                if (badge) {
+                    badge.innerText = data.wishlist_count;
+                    if (data.wishlist_count > 0) badge.classList.remove('hidden');
+                    else badge.classList.add('hidden');
+                }
+            }
+        });
+    }
+</script>
+{% endblock %}

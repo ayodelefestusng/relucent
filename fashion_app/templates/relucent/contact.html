@@ -1,0 +1,88 @@
+{% extends 'relucent/base.html' %}
+
+{% block title %}VIP Concierge & Contact — Relucent Clothing{% endblock %}
+
+{% block content %}
+<div class="bg-neutralBg/40 min-h-screen py-14 md:py-20">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <div class="text-center max-w-2xl mx-auto mb-16">
+            <span class="text-xs font-semibold tracking-[0.25em] text-gold uppercase">Private Fashion Advisory</span>
+            <h1 class="font-serif text-3xl md:text-5xl text-primary font-normal mt-2">Relucent Concierge</h1>
+            <p class="text-xs md:text-sm text-luxuryGray mt-2 font-light">
+                Whether you require bespoke size assistance, bridal styling, or international dispatch tracking, our client advisors are at your service.
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+            <!-- Left Contact Info -->
+            <div class="lg:col-span-5 bg-primary text-white p-8 md:p-10 flex flex-col justify-between shadow-xl">
+                <div>
+                    <h3 class="font-serif text-2xl text-gold mb-6">Boutique Headquarters</h3>
+                    <div class="space-y-6 text-xs text-gray-300">
+                        <div>
+                            <span class="text-gray-400 uppercase tracking-widest block text-[10px]">Lagos Flagship Atelier</span>
+                            <p class="font-serif text-sm text-white mt-1">Victoria Island, Lagos, Nigeria</p>
+                            <p class="text-gray-400 mt-0.5">By Private Appointment Only</p>
+                        </div>
+                        <div>
+                            <span class="text-gray-400 uppercase tracking-widest block text-[10px]">London Showroom</span>
+                            <p class="font-serif text-sm text-white mt-1">Mayfair, London W1, United Kingdom</p>
+                        </div>
+                        <div>
+                            <span class="text-gray-400 uppercase tracking-widest block text-[10px]">Direct Concierge Phone</span>
+                            <p class="font-serif text-sm text-white mt-1">{{ SUPPORT_PHONE }}</p>
+                        </div>
+                        <div>
+                            <span class="text-gray-400 uppercase tracking-widest block text-[10px]">Client Care Email</span>
+                            <p class="font-serif text-sm text-white mt-1">{{ SUPPORT_EMAIL }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-8 pt-6 border-t border-white/10">
+                    <a href="https://wa.me/2348007358236" target="_blank"
+                       class="flex items-center justify-center space-x-2 w-full py-3 bg-[#25D366] text-white font-semibold text-xs uppercase tracking-wider hover:opacity-90 transition-opacity">
+                        <span>Chat via WhatsApp VIP</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Right Message Form -->
+            <div class="lg:col-span-7 bg-white p-8 md:p-10 border border-gray-100 shadow-sm">
+                <h3 class="font-serif text-2xl text-primary mb-6">Send an Inquiry</h3>
+                <form action="{% url 'contact' %}" method="POST" class="space-y-5 text-xs">
+                    {% csrf_token %}
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block font-semibold uppercase tracking-wider text-gray-700 mb-1.5">Full Name *</label>
+                            <input type="text" name="name" required class="w-full px-4 py-3 bg-neutralBg border border-gray-300 text-xs focus:border-gold focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block font-semibold uppercase tracking-wider text-gray-700 mb-1.5">Email Address *</label>
+                            <input type="email" name="email" required class="w-full px-4 py-3 bg-neutralBg border border-gray-300 text-xs focus:border-gold focus:outline-none">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block font-semibold uppercase tracking-wider text-gray-700 mb-1.5">Subject *</label>
+                        <select name="subject" class="w-full px-4 py-3 bg-neutralBg border border-gray-300 text-xs focus:border-gold focus:outline-none">
+                            <option>Order Inquiries & Tracking</option>
+                            <option>Bespoke Sizing & Fit Advice</option>
+                            <option>Private Trunk Show / VIP Dressing</option>
+                            <option>Press & Partnerships</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-semibold uppercase tracking-wider text-gray-700 mb-1.5">Your Message *</label>
+                        <textarea name="message" rows="5" required class="w-full px-4 py-3 bg-neutralBg border border-gray-300 text-xs focus:border-gold focus:outline-none"></textarea>
+                    </div>
+                    <button type="submit" class="px-8 py-4 bg-primary text-white text-xs font-semibold tracking-[0.2em] uppercase hover:bg-gold transition-colors">
+                        Transmit Message
+                    </button>
+                </form>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

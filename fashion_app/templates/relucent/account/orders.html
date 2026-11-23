@@ -1,0 +1,47 @@
+{% extends 'relucent/base.html' %}
+{% load relucent_tags %}
+
+{% block title %}Order History — Relucent Clothing{% endblock %}
+
+{% block content %}
+<div class="bg-neutralBg/40 min-h-screen py-10 md:py-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <div class="flex items-center justify-between pb-6 border-b border-gray-200 mb-8">
+            <div>
+                <a href="{% url 'dashboard' %}" class="text-xs uppercase tracking-wider text-gray-400 hover:text-primary">&larr; Back to Dashboard</a>
+                <h1 class="font-serif text-3xl md:text-4xl text-primary mt-2">All Order History</h1>
+            </div>
+        </div>
+
+        <div class="bg-white p-6 md:p-8 border border-gray-100 shadow-sm">
+            {% if orders %}
+                <div class="divide-y divide-gray-100 text-xs">
+                    {% for ord in orders %}
+                        <div class="py-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                            <div>
+                                <span class="font-mono font-bold text-primary text-sm block">{{ ord.order_number }}</span>
+                                <span class="text-gray-400 text-[11px] block mt-0.5">{{ ord.created_at|date:"M d, Y • H:i" }}</span>
+                                <span class="text-gray-500 text-[11px] mt-1 block">Carrier: {{ ord.tracking_carrier }} {% if ord.tracking_number %}(#{{ ord.tracking_number }}){% endif %}</span>
+                            </div>
+                            <div class="flex items-center space-x-6">
+                                <div class="text-right">
+                                    <span class="font-bold text-primary text-sm block">{{ ord.total|currency_price:ord.currency }}</span>
+                                    <span class="text-[10px] text-gray-400">{{ ord.items.count }} items</span>
+                                </div>
+                                <span class="px-3 py-1 bg-neutralBg text-gray-700 font-semibold uppercase text-[10px]">{{ ord.get_order_status_display }}</span>
+                                <a href="{% url 'order_confirmation' ord.order_number %}" class="px-4 py-2 bg-primary text-white text-[10px] uppercase font-semibold hover:bg-gold transition-colors">
+                                    Receipt
+                                </a>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="text-center text-xs text-gray-400 py-12">No orders recorded under this account.</p>
+            {% endif %}
+        </div>
+
+    </div>
+</div>
+{% endblock %}

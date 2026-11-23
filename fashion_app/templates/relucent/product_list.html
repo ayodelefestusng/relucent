@@ -1,0 +1,248 @@
+{% extends 'relucent/base.html' %}
+{% load relucent_tags %}
+
+{% block title %}Shop All Collections — Relucent Clothing{% endblock %}
+
+{% block content %}
+<div class="bg-neutralBg/50 min-h-screen py-8 md:py-12" x-data="{ mobileFilterOpen: false }">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <!-- Breadcrumb & Header -->
+        <nav class="flex items-center space-x-2 text-xs text-gray-400 mb-6 uppercase tracking-wider">
+            <a href="{% url 'home' %}" class="hover:text-primary">Home</a>
+            <span>/</span>
+            <span class="text-primary font-semibold">
+                {% if active_gender %}{{ active_gender|title }}'s Collection
+                {% elif active_category %}{{ active_category|title }}
+                {% elif active_badge %}{{ active_badge|title }}
+                {% else %}All Luxury Pieces{% endif %}
+            </span>
+        </nav>
+
+        <div class="flex flex-col md:flex-row md:items-end justify-between pb-8 border-b border-gray-200">
+            <div>
+                <h1 class="font-serif text-3xl md:text-5xl text-primary font-normal">
+                    {% if active_gender %}{{ active_gender|title }}'s Collection
+                    {% elif search_query %}Search Results for "{{ search_query }}"
+                    {% else %}The Luxury Collection{% endif %}
+                </h1>
+                <p class="text-xs md:text-sm text-luxuryGray mt-2 font-light">
+                    Showing <span class="font-semibold text-primary">{{ product_count }}</span> refined creations crafted from premium silks, fine wools, and tailored silhouettes.
+                </p>
+            </div>
+
+            <!-- Top Filter & Sort Bar (Desktop & Mobile trigger) -->
+            <div class="mt-6 md:mt-0 flex items-center space-x-4">
+                <!-- Mobile Filter Toggle Button -->
+                <button @click="mobileFilterOpen = true" 
+                        class="lg:hidden flex items-center space-x-2 px-4 py-2.5 bg-white border border-gray-300 text-xs font-semibold tracking-wider uppercase text-primary">
+                    <i data-lucide="sliders-horizontal" class="w-4 h-4"></i>
+                    <span>Filters</span>
+                </button>
+
+                <!-- Sort Dropdown Form -->
+                <form method="GET" action="{% url 'product_list' %}" class="flex items-center space-x-2">
+                    {% if active_gender %}<input type="hidden" name="gender" value="{{ active_gender }}">{% endif %}
+                    {% if active_category %}<input type="hidden" name="category" value="{{ active_category }}">{% endif %}
+                    {% if active_badge %}<input type="hidden" name="badge" value="{{ active_badge }}">{% endif %}
+                    {% if search_query %}<input type="hidden" name="q" value="{{ search_query }}">{% endif %}
+                    
+                    <label for="sort-select" class="text-xs uppercase tracking-wider text-gray-500 hidden sm:inline">Sort By:</label>
+                    <select id="sort-select" name="sort" onchange="this.form.submit()" 
+                            class="px-3 py-2 bg-white border border-gray-300 text-xs text-primary focus:outline-none focus:border-gold">
+                        <option value="newest" {% if active_sort == 'newest' %}selected{% endif %}>Newest In</option>
+                        <option value="bestselling" {% if active_sort == 'bestselling' %}selected{% endif %}>Best Sellers</option>
+                        <option value="popular" {% if active_sort == 'popular' %}selected{% endif %}>Most Coveted</option>
+                        <option value="price_low" {% if active_sort == 'price_low' %}selected{% endif %}>Price: Low to High</option>
+                        <option value="price_high" {% if active_sort == 'price_high' %}selected{% endif %}>Price: High to Low</option>
+                    </select>
+                </form>
+            </div>
+        </div>
+
+        <!-- Gender Filter Pills -->
+        <div class="flex items-center space-x-2 py-6 overflow-x-auto hide-scrollbar text-xs font-semibold tracking-widest uppercase">
+            <a href="{% url 'product_list' %}" 
+               class="px-4 py-2 rounded-none transition-colors {% if not active_gender %}bg-primary text-white{% else %}bg-white border border-gray-200 text-primary hover:border-gold{% endif %}">
+                All
+            </a>
+            <a href="{% url 'product_list' %}?gender=women" 
+               class="px-4 py-2 rounded-none transition-colors {% if active_gender == 'women' %}bg-primary text-white{% else %}bg-white border border-gray-200 text-primary hover:border-gold{% endif %}">
+                Women
+            </a>
+            <a href="{% url 'product_list' %}?gender=men" 
+               class="px-4 py-2 rounded-none transition-colors {% if active_gender == 'men' %}bg-primary text-white{% else %}bg-white border border-gray-200 text-primary hover:border-gold{% endif %}">
+                Men
+            </a>
+            <a href="{% url 'product_list' %}?badge=new" 
+               class="px-4 py-2 rounded-none transition-colors {% if active_badge == 'new' %}bg-primary text-white{% else %}bg-white border border-gray-200 text-primary hover:border-gold{% endif %}">
+                New In
+            </a>
+            <a href="{% url 'product_list' %}?badge=bestseller" 
+               class="px-4 py-2 rounded-none transition-colors {% if active_badge == 'bestseller' %}bg-primary text-white{% else %}bg-white border border-gray-200 text-primary hover:border-gold{% endif %}">
+                Best Sellers
+            </a>
+            <a href="{% url 'product_list' %}?badge=sale" 
+               class="px-4 py-2 rounded-none transition-colors text-red-600 {% if active_badge == 'sale' %}bg-red-600 text-white{% else %}bg-white border border-gray-200 hover:border-red-600{% endif %}">
+                Archive Sale
+            </a>
+        </div>
+
+        <!-- Main Grid Layout with Left Filter Sidebar (Desktop) -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 pt-4">
+            
+            <!-- Desktop Sidebar Filter (3 Cols) -->
+            <aside class="hidden lg:block lg:col-span-3 space-y-8 pr-4 border-r border-gray-200">
+                <form method="GET" action="{% url 'product_list' %}" class="space-y-8">
+                    {% if active_gender %}<input type="hidden" name="gender" value="{{ active_gender }}">{% endif %}
+
+                    <!-- Categories Filter -->
+                    <div>
+                        <h3 class="font-serif text-sm uppercase tracking-wider text-primary border-b border-gray-200 pb-2">Category</h3>
+                        <div class="mt-3 space-y-2 text-xs">
+                            {% for cat in categories %}
+                                <label class="flex items-center space-x-2 text-gray-700 hover:text-gold cursor-pointer">
+                                    <input type="radio" name="category" value="{{ cat.slug }}" onchange="this.form.submit()"
+                                           {% if active_category == cat.slug %}checked{% endif %}
+                                           class="text-gold focus:ring-gold rounded-none">
+                                    <span>{{ cat.name }}</span>
+                                </label>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Collections Filter -->
+                    <div>
+                        <h3 class="font-serif text-sm uppercase tracking-wider text-primary border-b border-gray-200 pb-2">Collection</h3>
+                        <div class="mt-3 space-y-2 text-xs">
+                            {% for col in collections %}
+                                <label class="flex items-center space-x-2 text-gray-700 hover:text-gold cursor-pointer">
+                                    <input type="radio" name="collection" value="{{ col.slug }}" onchange="this.form.submit()"
+                                           {% if active_collection == col.slug %}checked{% endif %}
+                                           class="text-gold focus:ring-gold rounded-none">
+                                    <span>{{ col.name }}</span>
+                                </label>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Colors Swatches -->
+                    <div>
+                        <h3 class="font-serif text-sm uppercase tracking-wider text-primary border-b border-gray-200 pb-2">Colors</h3>
+                        <div class="mt-3 flex flex-wrap gap-2">
+                            {% for c in colors %}
+                                <a href="{% url 'product_list' %}?color={{ c.id }}{% if active_gender %}&gender={{ active_gender }}{% endif %}"
+                                   class="flex items-center space-x-1.5 px-2.5 py-1.5 bg-white border border-gray-200 text-xs hover:border-gold transition-colors"
+                                   title="{{ c.name }}">
+                                    <span class="w-3.5 h-3.5 rounded-full border border-gray-300" style="background-color: {{ c.hex_code }};"></span>
+                                    <span>{{ c.name }}</span>
+                                </a>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Sizes Selector -->
+                    <div>
+                        <h3 class="font-serif text-sm uppercase tracking-wider text-primary border-b border-gray-200 pb-2">Size</h3>
+                        <div class="mt-3 grid grid-cols-3 gap-2">
+                            {% for s in sizes %}
+                                <a href="{% url 'product_list' %}?size={{ s.id }}{% if active_gender %}&gender={{ active_gender }}{% endif %}"
+                                   class="py-2 text-center text-xs bg-white border border-gray-200 hover:border-gold transition-colors font-medium">
+                                    {{ s.name }}
+                                </a>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Clear Filters -->
+                    <div class="pt-4">
+                        <a href="{% url 'product_list' %}" class="block w-full py-2.5 text-center text-xs tracking-widest uppercase border border-primary hover:bg-primary hover:text-white transition-colors">
+                            Clear All Filters
+                        </a>
+                    </div>
+                </form>
+            </aside>
+
+            <!-- Product Grid (9 Cols) -->
+            <div class="lg:col-span-9">
+                {% include 'relucent/partials/product_grid.html' with products=products %}
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Mobile Bottom-Sheet Filter Drawer -->
+    <div x-show="mobileFilterOpen" x-cloak class="relative z-50 lg:hidden">
+        <div class="fixed inset-0 bg-black/50 backdrop-blur-sm" @click="mobileFilterOpen = false"></div>
+        <div class="fixed inset-y-0 right-0 max-w-xs w-full bg-white shadow-2xl p-6 overflow-y-auto">
+            <div class="flex items-center justify-between border-b border-gray-200 pb-4">
+                <h3 class="font-serif text-lg uppercase tracking-wider text-primary">Filter Catalog</h3>
+                <button @click="mobileFilterOpen = false"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            
+            <div class="mt-6 space-y-6">
+                <!-- Categories -->
+                <div>
+                    <h4 class="font-serif text-xs font-semibold uppercase tracking-wider text-gold mb-3">Categories</h4>
+                    <div class="space-y-2 text-xs">
+                        {% for cat in categories %}
+                            <a href="{% url 'product_list' %}?category={{ cat.slug }}" class="block py-1 text-gray-700 hover:text-gold">{{ cat.name }}</a>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Sizes -->
+                <div>
+                    <h4 class="font-serif text-xs font-semibold uppercase tracking-wider text-gold mb-3">Sizes</h4>
+                    <div class="grid grid-cols-3 gap-2 text-xs">
+                        {% for s in sizes %}
+                            <a href="{% url 'product_list' %}?size={{ s.id }}" class="py-2 text-center border border-gray-200">{{ s.name }}</a>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="pt-6 border-t border-gray-200">
+                    <a href="{% url 'product_list' %}" class="block w-full py-3 bg-primary text-white text-center text-xs uppercase tracking-widest font-semibold">
+                        Reset All Filters
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    function toggleWishlist(btn, productId) {
+        fetch(`/wishlist/toggle/${productId}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                if (data.is_wishlisted) {
+                    btn.classList.add('text-gold');
+                    btn.innerHTML = '<i data-lucide="heart" class="w-4 h-4 fill-current text-gold"></i>';
+                } else {
+                    btn.classList.remove('text-gold');
+                    btn.innerHTML = '<i data-lucide="heart" class="w-4 h-4 stroke-[1.5]"></i>';
+                }
+                lucide.createIcons();
+
+                const badge = document.getElementById('wishlist-badge');
+                if (badge) {
+                    badge.innerText = data.wishlist_count;
+                    if (data.wishlist_count > 0) badge.classList.remove('hidden');
+                    else badge.classList.add('hidden');
+                }
+            }
+        });
+    }
+</script>
+{% endblock %}

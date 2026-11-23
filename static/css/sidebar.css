@@ -1,0 +1,43 @@
+.side-bar{
+
+    background-color:gray;
+    position: fixed;
+    height: 500px;
+    left: 0px;
+    top: 55px;
+    width: 72px;
+    z-index: 200;
+    padding-top: 5px;
+}
+
+.sidebar-link{
+    background-color: aqua;
+    height: 75px;
+    margin-bottom: 1px; 
+
+    display: flex;
+    justify-content: center;
+    align-items: center; 
+    flex-direction: column;
+    cursor: pointer;
+     /* to display element above each other */
+   
+}
+.sidebar-link:hover{
+    background-color: yellow;
+
+}
+
+.side-bar img{
+/* target all images within the class titled .side-bar */
+height: 24px;
+}
+
+.sidebar-link div{
+/* target ONLY divs (sub) within the class titled .sidebar-link */
+
+font-family:Roboto,Arial;
+font-size: 10px;
+margin-bottom: 2px;
+
+}

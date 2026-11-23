@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    container_name: relucent_web
+    restart: always
+    ports:
+      - "8000:8000"
+    environment:
+      - DEBUG=False
+      - DJANGO_SECRET_KEY=production-secret-key-change-in-prod
+      - ALLOWED_HOSTS=*
+      - DB_ENGINE=django.db.backends.postgresql
+      - DB_NAME=relucent_db
+      - DB_USER=relucent_user
+      - DB_PASSWORD=relucent_pass
+      - DB_HOST=db
+      - DB_PORT=5432
+    depends_on:
+      - db
+    volumes:
+      - ./media:/app/media
+      - ./static:/app/static
+
+  db:
+    image: postgres:16-alpine
+    container_name: relucent_postgres
+    restart: always
+    environment:
+      POSTGRES_DB: relucent_db
+      POSTGRES_USER: relucent_user
+      POSTGRES_PASSWORD: relucent_pass
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+volumes:
+  postgres_data:

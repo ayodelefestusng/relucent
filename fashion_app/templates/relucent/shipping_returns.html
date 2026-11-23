@@ -1,0 +1,82 @@
+{% extends 'relucent/base.html' %}
+
+{% block title %}Shipping, Global Delivery & Returns — Relucent Clothing{% endblock %}
+
+{% block content %}
+<div class="bg-white min-h-screen py-14 md:py-20">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
+        
+        <div class="text-center">
+            <span class="text-xs font-semibold tracking-[0.25em] text-gold uppercase">Global Dispatch Guidelines</span>
+            <h1 class="font-serif text-3xl md:text-5xl text-primary font-normal mt-2">Shipping & Returns</h1>
+            <p class="text-xs md:text-sm text-luxuryGray mt-2 font-light">
+                White-glove courier packaging and fully insured international dispatch.
+            </p>
+        </div>
+
+        <!-- Section 1: Shipping Rates Table -->
+        <div>
+            <h2 class="font-serif text-2xl text-primary mb-4 pb-2 border-b border-gray-200">1. Delivery Tiers & Timelines</h2>
+            <div class="overflow-x-auto text-xs">
+                <table class="w-full text-left border-collapse border border-gray-200">
+                    <thead class="bg-neutralBg font-semibold text-primary uppercase">
+                        <tr>
+                            <th class="p-3 border border-gray-200">Destination</th>
+                            <th class="p-3 border border-gray-200">Courier Partner</th>
+                            <th class="p-3 border border-gray-200">Transit Duration</th>
+                            <th class="p-3 border border-gray-200">Rate</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200 text-luxuryGray">
+                        <tr>
+                            <td class="p-3 border border-gray-200 font-semibold text-primary">Lagos Metropolitan</td>
+                            <td class="p-3 border border-gray-200">Relucent VIP Courier</td>
+                            <td class="p-3 border border-gray-200">Same Day / 24 Hours</td>
+                            <td class="p-3 border border-gray-200">₦7,500 (Free over ₦150k)</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3 border border-gray-200 font-semibold text-primary">Nigeria (All States)</td>
+                            <td class="p-3 border border-gray-200">DHL Express Priority</td>
+                            <td class="p-3 border border-gray-200">1 - 2 Business Days</td>
+                            <td class="p-3 border border-gray-200">₦5,000 (Free over ₦150k)</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3 border border-gray-200 font-semibold text-primary">United Kingdom</td>
+                            <td class="p-3 border border-gray-200">DHL Express Worldwide</td>
+                            <td class="p-3 border border-gray-200">3 - 4 Business Days</td>
+                            <td class="p-3 border border-gray-200">₦25,000 / £20</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3 border border-gray-200 font-semibold text-primary">United States & Canada</td>
+                            <td class="p-3 border border-gray-200">DHL Express Worldwide</td>
+                            <td class="p-3 border border-gray-200">3 - 5 Business Days</td>
+                            <td class="p-3 border border-gray-200">₦28,000 / $25</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3 border border-gray-200 font-semibold text-primary">Europe & Rest of World</td>
+                            <td class="p-3 border border-gray-200">DHL Express Worldwide</td>
+                            <td class="p-3 border border-gray-200">4 - 6 Business Days</td>
+                            <td class="p-3 border border-gray-200">₦30,000 / €25</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Section 2: Returns Policy -->
+        <div id="returns" class="pt-6 border-t border-gray-200">
+            <h2 class="font-serif text-2xl text-primary mb-4 pb-2 border-b border-gray-200">2. Returns & Exchanges</h2>
+            <div class="space-y-3 text-xs text-luxuryGray leading-relaxed font-light">
+                <p>We want your Relucent piece to bring you absolute confidence. If you need a size exchange or store return, you have <strong>14 calendar days</strong> from the date of delivery.</p>
+                <ul class="list-disc pl-5 space-y-1.5 text-gray-700">
+                    <li>Items must be unworn, unwashed, and without perfume or deodorant marks.</li>
+                    <li>All original designer garment tags and security ribbons must remain affixed.</li>
+                    <li>Size exchanges within Nigeria and the United Kingdom are complimentary.</li>
+                </ul>
+                <p class="pt-2">To initiate an exchange, please email <strong class="text-primary">{{ SUPPORT_EMAIL }}</strong> with your order number.</p>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,59 @@
+{% extends 'relucent/base.html' %}
+
+{% block title %}The Atelier Story & Craftsmanship — Relucent Clothing{% endblock %}
+
+{% block content %}
+<div class="bg-white min-h-screen">
+    
+    <!-- Hero Header -->
+    <div class="relative py-24 md:py-32 bg-primary text-white text-center overflow-hidden">
+        <div class="max-w-4xl mx-auto px-4 relative z-10">
+            <span class="text-xs font-semibold tracking-[0.3em] uppercase text-gold">The Relucent Manifesto</span>
+            <h1 class="font-serif text-4xl sm:text-6xl text-white mt-3 font-normal leading-tight">
+                Where African Grandeur Meets Savile Row Precision
+            </h1>
+            <p class="text-gray-300 text-sm md:text-base mt-6 max-w-2xl mx-auto font-light leading-relaxed">
+                Relucent was conceived as a rebellion against compromise. We craft modern, luxurious, timeless silhouettes designed to turn heads across Lagos, London, New York, and Paris.
+            </p>
+        </div>
+    </div>
+
+    <!-- Atelier Narrative -->
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-20 space-y-20">
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+            <div>
+                <span class="text-xs font-semibold tracking-[0.2em] text-gold uppercase">01 / The Origin</span>
+                <h2 class="font-serif text-3xl text-primary mt-2">Crafting Affordable Luxury</h2>
+                <p class="text-xs md:text-sm text-luxuryGray mt-4 leading-relaxed font-light">
+                    For decades, high fashion presented an unfair dichotomy: exorbitant European couture with thousands of percent markup, or fast-fashion synthetic polyester that loses form after two wears.
+                </p>
+                <p class="text-xs md:text-sm text-luxuryGray mt-3 leading-relaxed font-light">
+                    Relucent Clothing bridges this chasm. We source 100% natural Mulberry silk, double-faced Australian cashmere wools, and Egyptian cottons, cutting and tailoring each garment with Savile Row master cutters.
+                </p>
+            </div>
+            <div class="aspect-[4/5] bg-neutralBg overflow-hidden shadow-xl">
+                <img src="https://images.unsplash.com/photo-1558769132-cb1aea458c5e?auto=format&fit=crop&w=800&q=80" alt="Relucent Atelier" class="w-full h-full object-cover">
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+            <div class="order-2 md:order-1 aspect-[4/5] bg-neutralBg overflow-hidden shadow-xl">
+                <img src="https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=800&q=80" alt="Savile Row Tailoring" class="w-full h-full object-cover">
+            </div>
+            <div class="order-1 md:order-2">
+                <span class="text-xs font-semibold tracking-[0.2em] text-gold uppercase">02 / The Standard</span>
+                <h2 class="font-serif text-3xl text-primary mt-2">Uncompromising Materiality</h2>
+                <p class="text-xs md:text-sm text-luxuryGray mt-4 leading-relaxed font-light">
+                    Every seam is fortified with french seams and silk bias tape. Hand-finished buttonholes, genuine horn and Mother of Pearl buttons, and bespoke 18k gold-dipped metal aglets are standard on every creation.
+                </p>
+                <div class="mt-6 p-4 bg-neutralBg border-l-4 border-gold">
+                    <p class="font-serif italic text-sm text-primary">"True elegance is when the inside of the garment is as beautiful as the outside."</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,95 @@
+{% extends 'relucent/base.html' %}
+{% load relucent_tags %}
+
+{% block title %}Order Confirmed — Relucent Clothing{% endblock %}
+
+{% block content %}
+<div class="bg-neutralBg/40 min-h-screen py-14 md:py-20">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <!-- Confirmation Box -->
+        <div class="bg-white p-8 md:p-12 border border-gray-100 shadow-sm text-center">
+            <div class="w-16 h-16 bg-gold/10 text-gold rounded-full flex items-center justify-center mx-auto mb-4">
+                <i data-lucide="check" class="w-8 h-8 stroke-[2.5]"></i>
+            </div>
+            
+            <span class="text-xs font-semibold tracking-[0.25em] text-gold uppercase">Payment Confirmed</span>
+            <h1 class="font-serif text-3xl md:text-4xl text-primary mt-2">Thank You For Your Order</h1>
+            <p class="text-xs md:text-sm text-luxuryGray mt-2 max-w-md mx-auto font-light">
+                Your order <strong class="text-primary font-mono">{{ order.order_number }}</strong> has been registered at our atelier. A receipt and dispatch details have been sent to <span class="font-semibold text-primary">{{ order.customer_email }}</span>.
+            </p>
+
+            <!-- Order Timeline Status -->
+            <div class="my-10 py-6 border-y border-gray-100 grid grid-cols-4 gap-2 text-center text-xs">
+                <div>
+                    <div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center mx-auto font-bold text-xs mb-1.5"><i data-lucide="check" class="w-4 h-4"></i></div>
+                    <span class="font-bold text-primary block">Confirmed</span>
+                    <span class="text-[10px] text-gray-400">Paid Securely</span>
+                </div>
+                <div>
+                    <div class="w-8 h-8 rounded-full bg-gold text-white flex items-center justify-center mx-auto font-bold text-xs mb-1.5"><i data-lucide="scissors" class="w-4 h-4"></i></div>
+                    <span class="font-bold text-primary block">Atelier Tailoring</span>
+                    <span class="text-[10px] text-gray-400">Quality Inspection</span>
+                </div>
+                <div>
+                    <div class="w-8 h-8 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center mx-auto font-bold text-xs mb-1.5"><i data-lucide="plane" class="w-4 h-4"></i></div>
+                    <span class="text-gray-500 block">Dispatched</span>
+                    <span class="text-[10px] text-gray-400">{{ order.tracking_carrier }}</span>
+                </div>
+                <div>
+                    <div class="w-8 h-8 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center mx-auto font-bold text-xs mb-1.5"><i data-lucide="package-check" class="w-4 h-4"></i></div>
+                    <span class="text-gray-500 block">Delivered</span>
+                    <span class="text-[10px] text-gray-400">Signatory Courier</span>
+                </div>
+            </div>
+
+            <!-- Order Details Overview -->
+            <div class="text-left text-xs bg-neutralBg p-6 space-y-4">
+                <div class="grid grid-cols-2 gap-4 pb-4 border-b border-gray-200">
+                    <div>
+                        <span class="text-gray-400 uppercase tracking-wider block text-[10px]">Client Name</span>
+                        <span class="font-semibold text-primary mt-0.5 block">{{ order.customer_name }}</span>
+                    </div>
+                    <div>
+                        <span class="text-gray-400 uppercase tracking-wider block text-[10px]">Shipping Destination</span>
+                        <span class="text-primary mt-0.5 block">{{ order.shipping_address }}, {{ order.city }}, {{ order.country }}</span>
+                    </div>
+                </div>
+
+                <!-- Ordered Items -->
+                <div class="space-y-3">
+                    <span class="text-gray-400 uppercase tracking-wider block text-[10px]">Acquisitions</span>
+                    {% for item in order.items.all %}
+                        <div class="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
+                            <div>
+                                <span class="font-serif font-semibold text-primary block">{{ item.product_name }}</span>
+                                <span class="text-[11px] text-gray-500">{{ item.variant_details }} • Qty: {{ item.quantity }}</span>
+                            </div>
+                            <span class="font-bold text-primary">{{ item.line_total|currency_price:order.currency }}</span>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <div class="pt-4 border-t border-gray-200 flex justify-between items-baseline font-serif">
+                    <span class="text-sm font-semibold uppercase">Total Settled</span>
+                    <span class="text-2xl font-bold text-primary">{{ order.total|currency_price:order.currency }}</span>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
+                <a href="{% url 'track_order' %}?order_number={{ order.order_number }}&email={{ order.customer_email }}" 
+                   class="w-full sm:w-auto px-8 py-3.5 bg-primary text-white text-xs font-semibold tracking-widest uppercase hover:bg-gold transition-colors">
+                    Track Live Shipment
+                </a>
+                <a href="{% url 'product_list' %}" 
+                   class="w-full sm:w-auto px-8 py-3.5 bg-white border border-gray-300 text-primary text-xs font-semibold tracking-widest uppercase hover:border-gold transition-colors">
+                    Continue Shopping
+                </a>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+{% endblock %}

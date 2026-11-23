@@ -1,0 +1,63 @@
+{% load relucent_tags %}
+<div id="cart-drawer-items" class="flex-1 overflow-y-auto p-6 space-y-6 hide-scrollbar">
+    {% if cart and cart.items.exists %}
+        {% for item in cart.items.all %}
+            <div class="flex items-start space-x-4 pb-6 border-b border-gray-100">
+                <img src="{{ item.variant.product.primary_image_url }}" alt="{{ item.variant.product.name }}" 
+                     class="w-20 h-24 object-cover bg-neutralBg flex-shrink-0 border border-gray-100">
+                <div class="flex-1 min-w-0">
+                    <h3 class="text-sm font-medium text-primary truncate">
+                        <a href="{% url 'product_detail' item.variant.product.slug %}">{{ item.variant.product.name }}</a>
+                    </h3>
+                    <p class="text-xs text-luxuryGray mt-0.5">{{ item.variant.color.name }} • Size: {{ item.variant.size.name }}</p>
+                    <p class="text-sm font-semibold text-primary mt-2">{{ item.unit_price_ngn|currency_price:ACTIVE_CURRENCY }}</p>
+                    
+                    <!-- Quantity & Remove -->
+                    <div class="flex items-center justify-between mt-3">
+                        <div class="flex items-center border border-gray-200 text-xs">
+                            <form hx-post="{% url 'cart_update' item.id %}" hx-target="#cart-drawer-items" hx-swap="outerHTML">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="decrease">
+                                <button type="submit" class="px-2.5 py-1 text-gray-500 hover:text-primary">-</button>
+                            </form>
+                            <span class="px-3 py-1 font-semibold text-primary">{{ item.quantity }}</span>
+                            <form hx-post="{% url 'cart_update' item.id %}" hx-target="#cart-drawer-items" hx-swap="outerHTML">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="increase">
+                                <button type="submit" class="px-2.5 py-1 text-gray-500 hover:text-primary">+</button>
+                            </form>
+                        </div>
+                        <form hx-post="{% url 'cart_update' item.id %}" hx-target="#cart-drawer-items" hx-swap="outerHTML">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="remove">
+                            <button type="submit" class="text-xs text-gray-400 hover:text-red-600 transition-colors">Remove</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+        <script>
+            // Update badge counts
+            const badge = document.getElementById('cart-badge');
+            const drawerBadge = document.getElementById('drawer-count');
+            if (badge) badge.innerText = '{{ cart.total_items }}';
+            if (drawerBadge) drawerBadge.innerText = '{{ cart.total_items }}';
+        </script>
+    {% else %}
+        <div class="text-center py-16">
+            <i data-lucide="shopping-bag" class="w-12 h-12 text-gray-300 mx-auto stroke-1"></i>
+            <h4 class="font-serif text-lg text-primary mt-4">Your bag is empty</h4>
+            <p class="text-xs text-luxuryGray mt-1">Explore our latest luxury designs and add timeless elegance to your wardrobe.</p>
+            <a href="{% url 'product_list' %}" @click="cartDrawerOpen = false" 
+               class="inline-block mt-6 px-6 py-3 bg-primary text-white text-xs font-semibold tracking-widest uppercase hover:bg-gold transition-colors">
+                Explore Collections
+            </a>
+        </div>
+        <script>
+            const badge = document.getElementById('cart-badge');
+            const drawerBadge = document.getElementById('drawer-count');
+            if (badge) badge.innerText = '0';
+            if (drawerBadge) drawerBadge.innerText = '0';
+        </script>
+    {% endif %}
+</div>

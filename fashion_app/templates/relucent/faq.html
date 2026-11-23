@@ -1,0 +1,64 @@
+{% extends 'relucent/base.html' %}
+
+{% block title %}Frequently Asked Questions — Relucent Clothing{% endblock %}
+
+{% block content %}
+<div class="bg-white min-h-screen py-14 md:py-20">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <div class="text-center mb-16">
+            <span class="text-xs font-semibold tracking-[0.25em] text-gold uppercase">Concierge Knowledge Base</span>
+            <h1 class="font-serif text-3xl md:text-5xl text-primary font-normal mt-2">Frequently Asked Questions</h1>
+            <p class="text-xs md:text-sm text-luxuryGray mt-2 font-light">
+                Answers to sizing, international dispatch, returns, and couture care.
+            </p>
+        </div>
+
+        <div class="space-y-4" x-data="{ active: 1 }">
+            
+            <div class="border border-gray-200 p-6 transition-all" :class="active === 1 ? 'border-gold bg-neutralBg/30' : ''">
+                <button @click="active = (active === 1 ? null : 1)" class="w-full flex items-center justify-between text-left font-serif text-base text-primary">
+                    <span>What delivery timeframes should I anticipate?</span>
+                    <i data-lucide="chevron-down" class="w-4 h-4 transition-transform text-gold" :class="active === 1 ? 'rotate-180' : ''"></i>
+                </button>
+                <div x-show="active === 1" class="mt-4 text-xs text-luxuryGray leading-relaxed font-light space-y-2">
+                    <p>For orders within Nigeria: DHL Express delivery takes 1 to 2 business days (Same-day dispatch available in Lagos).</p>
+                    <p>For international clients (United Kingdom, United States, Europe, UAE): DHL Express Worldwide Priority arrives within 3 to 5 business days with full door-to-door tracking.</p>
+                </div>
+            </div>
+
+            <div class="border border-gray-200 p-6 transition-all" :class="active === 2 ? 'border-gold bg-neutralBg/30' : ''">
+                <button @click="active = (active === 2 ? null : 2)" class="w-full flex items-center justify-between text-left font-serif text-base text-primary">
+                    <span>How do I determine my accurate size?</span>
+                    <i data-lucide="chevron-down" class="w-4 h-4 transition-transform text-gold" :class="active === 2 ? 'rotate-180' : ''"></i>
+                </button>
+                <div x-show="active === 2" class="mt-4 text-xs text-luxuryGray leading-relaxed font-light">
+                    <p>We feature our proprietary <a href="{% url 'size_guide' %}" class="text-gold font-semibold underline">Relucent FitFinder™ AI</a> on every product page. Simply input your height, weight, and preferred silhouette fit to receive an exact tailored recommendation.</p>
+                </div>
+            </div>
+
+            <div class="border border-gray-200 p-6 transition-all" :class="active === 3 ? 'border-gold bg-neutralBg/30' : ''">
+                <button @click="active = (active === 3 ? null : 3)" class="w-full flex items-center justify-between text-left font-serif text-base text-primary">
+                    <span>What is your exchange and return policy?</span>
+                    <i data-lucide="chevron-down" class="w-4 h-4 transition-transform text-gold" :class="active === 3 ? 'rotate-180' : ''"></i>
+                </button>
+                <div x-show="active === 3" class="mt-4 text-xs text-luxuryGray leading-relaxed font-light">
+                    <p>We honor a 14-day return window from receipt of your shipment. Garments must be unworn, in original luxury garment sleeves, with security tags fully intact. Size exchanges are complimentary.</p>
+                </div>
+            </div>
+
+            <div class="border border-gray-200 p-6 transition-all" :class="active === 4 ? 'border-gold bg-neutralBg/30' : ''">
+                <button @click="active = (active === 4 ? null : 4)" class="w-full flex items-center justify-between text-left font-serif text-base text-primary">
+                    <span>What payment methods are supported?</span>
+                    <i data-lucide="chevron-down" class="w-4 h-4 transition-transform text-gold" :class="active === 4 ? 'rotate-180' : ''"></i>
+                </button>
+                <div x-show="active === 4" class="mt-4 text-xs text-luxuryGray leading-relaxed font-light">
+                    <p>We process all major debit/credit cards (Visa, Mastercard, Verve, American Express), Apple Pay, Google Pay, Paystack, Flutterwave, and direct bank transfers in NGN, USD, GBP, and EUR.</p>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+{% endblock %}

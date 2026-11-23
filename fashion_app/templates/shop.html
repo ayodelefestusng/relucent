@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}
+<title>Ecom</title>
+{% endblock title %}
+
+{% block content %}
+  
+  
+<h1>Hello, world!</h1>
+
+   
+<div class=" Delivery Note container-fluid">
+  <h1> Delivery Update  </h1>
+</div>
+<div class=" Delivery Note container-fluid">
+  <div class="container text-center">
+  
+  </div>
+
+</div>
+<div class="row d-flex justify-content-center">
+{% for i in product %}
+<div class=" col-md-3 mx-1 mb-5 text-dark">
+  <img class="thumbnail" src="{{i.product_image.url}}">
+  <div class="box-element product">
+    <h6><strong>{{i.name}}, {{i.id}}, {{i.price}} </strong></h6>
+    <hr>
+
+    <form class="btn btn-outline-secondary add-btn update-cart" action="{% url 'ordert'%}" method="post">
+      {% csrf_token %}
+        
+
+      <input type="hidden"  name = 'product' id='product' value = {{i.name}} > 
+
+      <input type="hidden"  name = 'price' id='price' value = {{i.price}} > 
+
+      <button type="submit" class="btn btn-outline-secondary add-btn update-cart">Update Task</button>
+
+
+    </form>
+
+    <!-- <button data-product="{{product.id}}" data-action="add" class="btn btn-outline-secondary add-btn update-cart">Add to Cart</button> -->
+  
+    <a class="btn btn-outline-success" href="#">View</a>
+    <h5 style="display: inline-block; float: right"><strong>NGN{{i.price}}</strong></h5>
+
+  </div>
+ </div>
+{% endfor %}
+
+<div>
+
+</div>
+YemiTTTT
+{{yemi}}
+{% endblock content %}
+
+
+
+
+
+  <!-- <form method ='POST' class ="row">
+    {% csrf_token %}
+      <input type="text" class="form-control col-lg-2"  name = 'task' id='task' placeholder={{task_object}} value ={{task_object}}>
+      <input type="hidden"  name = 'done' id='done' value ={{task_object.id}} > 
+    <button type="submit" class="btn btn-primary col-lg-2">Update Task</button>
+  </form>
+
+  <form action="{% url 'polls:vote' question.id %}" method="post">
+    {% csrf_token %}
+    <fieldset>
+        <legend><h3>{{ question.question_text }}</h3></legend>
+        {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+        {% for choice in question.choice_set.all %}
+            <input type="radio" name="choice" id="choice{{ forloop.counter }}" value="{{ choice.id }}">
+            <label for="choice{{ forloop.counter }}">{{ choice.choice_text }}</label><br>
+        {% endfor %}
+    </fieldset>
+    <input type="submit" value="Vote">
+    </form> -->

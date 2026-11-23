@@ -1,0 +1,112 @@
+{% extends 'relucent/base.html' %}
+{% load relucent_tags %}
+
+{% block title %}Track Live Order — Relucent Clothing{% endblock %}
+
+{% block content %}
+<div class="bg-neutralBg/50 min-h-screen py-12 md:py-20">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <div class="text-center mb-10">
+            <span class="text-xs font-semibold tracking-[0.25em] text-gold uppercase">Real-Time Dispatch Logistics</span>
+            <h1 class="font-serif text-3xl md:text-4xl text-primary font-normal mt-1">Track Your Order</h1>
+            <p class="text-xs md:text-sm text-luxuryGray mt-2 font-light">
+                Enter your Relucent order code (e.g. REL-2026...) and email to check live courier milestones.
+            </p>
+        </div>
+
+        <!-- Search Form -->
+        <div class="bg-white p-6 md:p-8 border border-gray-100 shadow-sm mb-10">
+            <form action="{% url 'track_order' %}" method="GET" class="grid grid-cols-1 sm:grid-cols-12 gap-4">
+                <div class="sm:col-span-6">
+                    <label class="block text-xs uppercase tracking-wider text-gray-700 font-semibold mb-1.5">Order Number *</label>
+                    <input type="text" name="order_number" value="{{ order_number }}" required placeholder="e.g. REL-2026-..." 
+                           class="w-full px-4 py-3 bg-neutralBg border border-gray-300 text-xs font-mono uppercase focus:border-gold focus:outline-none">
+                </div>
+                <div class="sm:col-span-4">
+                    <label class="block text-xs uppercase tracking-wider text-gray-700 font-semibold mb-1.5">Email Address</label>
+                    <input type="email" name="email" value="{{ email }}" placeholder="Optional verification email" 
+                           class="w-full px-4 py-3 bg-neutralBg border border-gray-300 text-xs focus:border-gold focus:outline-none">
+                </div>
+                <div class="sm:col-span-2 flex items-end">
+                    <button type="submit" 
+                            class="w-full py-3.5 bg-primary text-white text-xs font-semibold tracking-widest uppercase hover:bg-gold transition-colors">
+                        Track
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Order Result -->
+        {% if searched %}
+            {% if order %}
+                <div class="bg-white p-8 border border-gray-100 shadow-sm space-y-8">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-6 border-b border-gray-100">
+                        <div>
+                            <span class="text-xs font-mono text-gray-400">Order: {{ order.order_number }}</span>
+                            <h2 class="font-serif text-2xl text-primary mt-1">Status: {{ order.get_order_status_display }}</h2>
+                        </div>
+                        <span class="mt-2 sm:mt-0 text-xs px-3 py-1 bg-gold/10 text-gold font-bold uppercase tracking-wider">
+                            Carrier: {{ order.tracking_carrier }}
+                        </span>
+                    </div>
+
+                    <!-- Visual Timeline -->
+                    <div class="grid grid-cols-4 gap-2 text-center text-xs">
+                        <div>
+                            <div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center mx-auto mb-1"><i data-lucide="check" class="w-4 h-4"></i></div>
+                            <span class="font-bold text-primary block">Placed</span>
+                            <span class="text-[10px] text-gray-400">{{ order.created_at|date:"M d" }}</span>
+                        </div>
+                        <div>
+                            <div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center mx-auto mb-1"><i data-lucide="scissors" class="w-4 h-4"></i></div>
+                            <span class="font-bold text-primary block">Prepared</span>
+                            <span class="text-[10px] text-gray-400">Atelier Checked</span>
+                        </div>
+                        <div>
+                            <div class="w-8 h-8 rounded-full {% if order.order_status == 'shipped' or order.order_status == 'delivered' %}bg-primary text-white{% else %}bg-gray-200 text-gray-400{% endif %} flex items-center justify-center mx-auto mb-1"><i data-lucide="plane" class="w-4 h-4"></i></div>
+                            <span class="font-bold text-primary block">In Transit</span>
+                            <span class="text-[10px] text-gray-400">DHL Express</span>
+                        </div>
+                        <div>
+                            <div class="w-8 h-8 rounded-full {% if order.order_status == 'delivered' %}bg-successGreen text-white{% else %}bg-gray-200 text-gray-400{% endif %} flex items-center justify-center mx-auto mb-1"><i data-lucide="package-check" class="w-4 h-4"></i></div>
+                            <span class="font-bold text-primary block">Delivered</span>
+                            <span class="text-[10px] text-gray-400">Signatory</span>
+                        </div>
+                    </div>
+
+                    <!-- Items in order -->
+                    <div class="pt-6 border-t border-gray-100 text-xs">
+                        <h3 class="font-serif text-sm font-semibold text-primary uppercase mb-3">Order Contents</h3>
+                        <div class="divide-y divide-gray-100">
+                            {% for item in order.items.all %}
+                                <div class="py-3 flex items-center justify-between">
+                                    <div>
+                                        <span class="font-semibold text-primary block">{{ item.product_name }}</span>
+                                        <span class="text-gray-500 text-[11px]">{{ item.variant_details }} • Qty: {{ item.quantity }}</span>
+                                    </div>
+                                    <span class="font-bold text-primary">{{ item.line_total|currency_price:order.currency }}</span>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Destination details -->
+                    <div class="p-4 bg-neutralBg text-xs space-y-1">
+                        <span class="text-gray-400 text-[10px] uppercase tracking-wider block">Shipping Address:</span>
+                        <p class="text-primary font-medium">{{ order.customer_name }}, {{ order.shipping_address }}, {{ order.city }}, {{ order.country }}</p>
+                    </div>
+
+                </div>
+            {% else %}
+                <div class="bg-white p-12 text-center border border-gray-100 shadow-sm">
+                    <i data-lucide="search-x" class="w-12 h-12 text-gray-300 mx-auto stroke-1"></i>
+                    <h3 class="font-serif text-xl text-primary mt-3">No matching order found</h3>
+                    <p class="text-xs text-luxuryGray mt-1">Please double-check your order reference number or contact our concierge.</p>
+                </div>
+            {% endif %}
+        {% endif %}
+
+    </div>
+</div>
+{% endblock %}
