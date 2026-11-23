@@ -62,9 +62,9 @@ def relucent_global_context(request):
         'BRAND_NAME': 'Relucent Clothing',
         'BRAND_TAGLINE': 'Affordable Luxury & Modern Elegance',
         'BRAND_LOGO_URL': '/static/images/relucent-logo.jpg',
-        'SUPPORT_WHATSAPP': '+234800RELUCENT',
+        'SUPPORT_WHATSAPP': '+234 906 679 9026',
         'SUPPORT_EMAIL': 'concierge@relucentclothing.com',
-        'SUPPORT_PHONE': '+234 1 800 7358',
+        'SUPPORT_PHONE': '+234 906 679 9026',
         'ACTIVE_CURRENCY': active_currency,
         'CURRENCY_SYMBOL': currency_symbol,
         'ALL_CURRENCIES': [
