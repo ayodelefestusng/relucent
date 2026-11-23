@@ -83,6 +83,8 @@ def shipping_returns_view(request):
 def size_guide_view(request):
     return render(request, 'relucent/size_guide.html')
 
+def utility_view(request):
+    return HttpResponse("Utility Page")
 
 # ==========================================
 # PRODUCT LISTING & DETAILS

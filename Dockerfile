@@ -1,31 +1,40 @@
-# Multi-stage Dockerfile leveraging Astral uv for 10-100x faster builds
+# ---------- Builder Stage ----------
 FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim AS builder
 
-ENV UV_COMPILE_BYTECODE=1 UV_LINK_MODE=copy
+ENV UV_COMPILE_BYTECODE=1 \
+    UV_LINK_MODE=copy
+
 WORKDIR /app
 
-# Install dependencies using uv
-RUN --mount=type=cache,target=/root/.cache/uv \
-    --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
-    uv sync --frozen --no-install-project --no-dev || uv pip install --system "django>=5.0.0" "pillow>=10.0.0" "requests" "stripe" "python-dotenv" "django-import-export" "gunicorn" "psycopg[binary]"
+# Copy dependency manifests first for better layer caching
+COPY pyproject.toml ./
 
+# If you use uv.lock, copy it too
+COPY uv.lock* ./
+
+# Install dependencies from pyproject.toml
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv pip install --system .
+
+# ---------- Runtime Stage ----------
 FROM python:3.12-slim-bookworm
 
 ENV PYTHONUNBUFFERED=1 \
-    PYTHONDONTWRITEBYTECODE=1 \
-    PATH="/app/.venv/bin:$PATH"
+    PYTHONDONTWRITEBYTECODE=1
 
 WORKDIR /app
 
-# Install runtime system packages (curl for healthchecks)
+# Runtime packages
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    curl libpq5 \
+    curl \
+    libpq5 \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy installed environment from builder
+# Copy installed Python packages
 COPY --from=builder /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
 COPY --from=builder /usr/local/bin /usr/local/bin
 
+# Copy application source
 COPY . /app
 
 EXPOSE 8000
