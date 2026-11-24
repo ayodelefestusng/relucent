@@ -1,4 +1,4 @@
-from .models import Cart, Wishlist, Category, Collection
+from django.templatetags.static import static
 from decimal import Decimal
 
 CURRENCY_SYMBOLS = {
@@ -61,7 +61,7 @@ def relucent_global_context(request):
     return {
         'BRAND_NAME': 'Relucent Clothing',
         'BRAND_TAGLINE': 'Affordable Luxury & Modern Elegance',
-        'BRAND_LOGO_URL': '/static/images/relucent-logo.jpg',
+        'BRAND_LOGO_URL': request.build_absolute_uri(static('images/relucent-logo.jpg')),
         'SUPPORT_WHATSAPP': '+234 906 679 9026',
         'SUPPORT_EMAIL': 'concierge@relucentclothing.com',
         'SUPPORT_PHONE': '+234 906 679 9026',
