@@ -18,7 +18,8 @@ RUN --mount=type=cache,target=/root/.cache/uv \
     django-import-export \
     gunicorn \
     psycopg[binary] \
-    dj-database-url
+    dj-database-url \
+    whitenoise
 
 FROM python:3.12-slim-bookworm
 
