@@ -9,17 +9,7 @@ COPY pyproject.toml ./
 
 # Install dependencies directly from pyproject.toml
 RUN --mount=type=cache,target=/root/.cache/uv \
-    uv pip install --system \
-    django \
-    pillow \
-    requests \
-    stripe \
-    python-dotenv \
-    django-import-export \
-    gunicorn \
-    psycopg[binary] \
-    dj-database-url \
-    whitenoise
+    uv pip install --system -r pyproject.toml
 
 FROM python:3.12-slim-bookworm
 
