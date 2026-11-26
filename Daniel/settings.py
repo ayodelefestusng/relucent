@@ -16,7 +16,16 @@ load_dotenv(BASE_DIR / '.env')
 SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'django-insecure-relucent-luxury-fashion-platform-2026-key')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv('DEBUG', 'True') == 'True'
+DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
+
+ALLOWED_HOSTS = [
+    h.strip()
+    for h in os.getenv(
+        'ALLOWED_HOSTS',
+        'vectra-relucent-app.qgmg5v.easypanel.host,localhost,127.0.0.1',
+    ).split(',')
+    if h.strip()
+]
 
 CSRF_TRUSTED_ORIGINS = [
     "https://vectra-relucent-app.qgmg5v.easypanel.host",
