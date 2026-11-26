@@ -33,6 +33,17 @@ def currency_price(price_ngn, currency='NGN'):
     except Exception:
         return f"₦{price_ngn}"
 
+@register.filter(name='replace')
+def replace(value, arg):
+    """Replace occurrences of a substring.
+    Usage: {{ value|replace:"old,new" }}
+    """
+    try:
+        old, new = arg.split(',')
+        return value.replace(old, new)
+    except Exception:
+        return value
+
 @register.filter(name='times')
 def times(number):
     try:

@@ -1,6 +1,6 @@
 from django.templatetags.static import static
-from .models import Cart, Wishlist, Collection, HomepageVideo
-
+from decimal import Decimal
+from .models import Cart, Wishlist, Collection, HomepageVideo, Category
 
 CURRENCY_SYMBOLS = {
     'NGN': '₦',
@@ -64,6 +64,7 @@ def relucent_global_context(request):
     # Homepage video (first active)
     homepage_video = HomepageVideo.objects.filter(is_active=True).first()
 
+    return {
         'BRAND_NAME': 'Relucent Clothing',
         'BRAND_TAGLINE': 'Affordable Luxury & Modern Elegance',
         'BRAND_LOGO_URL': request.build_absolute_uri(static('images/relucent-logo.jpg')),
@@ -86,5 +87,4 @@ def relucent_global_context(request):
         'NAV_COLLECTIONS': nav_collections,
         'CAROUSEL_IMAGES': carousel_images,
         'HOMEPAGE_VIDEO': homepage_video,
-
     }

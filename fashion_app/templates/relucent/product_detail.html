@@ -50,11 +50,13 @@
                 <!-- Vertical Thumbnail Strip (Desktop) -->
                 <div class="flex md:flex-col space-x-3 md:space-x-0 md:space-y-3 overflow-x-auto md:overflow-visible hide-scrollbar flex-shrink-0">
                     {% for img in product.images.all %}
-                        <button @click="activeImage = '{{ img.image_url }}'" 
-                                class="w-16 h-20 md:w-20 md:h-26 border-2 transition-all overflow-hidden bg-neutralBg"
-                                :class="activeImage === '{{ img.image_url }}' ? 'border-gold' : 'border-transparent hover:border-gray-300'">
-                            <img src="{{ img.image_url }}" alt="{{ product.name }}" class="w-full h-full object-cover">
-                        </button>
+                        {% if img.image_url %}
+                            <button @click="activeImage = '{{ img.image_url.url }}'" 
+                                    class="w-16 h-20 md:w-20 md:h-26 border-2 transition-all overflow-hidden bg-neutralBg"
+                                    :class="activeImage === '{{ img.image_url.url }}' ? 'border-gold' : 'border-transparent hover:border-gray-300'">
+                                <img src="{{ img.image_url.url }}" alt="{{ product.name }}" class="w-full h-full object-cover">
+                            </button>
+                        {% endif %}
                     {% endfor %}
                 </div>
 

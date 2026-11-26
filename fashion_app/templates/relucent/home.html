@@ -41,7 +41,7 @@
 <div class="max-w-4xl mx-auto px-4 py-8">
   <h2 class="text-2xl font-serif text-center mb-4">{{ HOMEPAGE_VIDEO.title }}</h2>
   <div class="aspect-w-16 aspect-h-9">
-    <iframe src="{{ HOMEPAGE_VIDEO.video_url|replace:'watch?v=','embed/' }}" title="Homepage video" allowfullscreen class="w-full h-full rounded-lg"></iframe>
+    <iframe src="{{ HOMEPAGE_VIDEO.video_url|replace:"watch?v=,embed/" }}" title="Homepage video" allowfullscreen class="w-full h-full rounded-lg"></iframe>
   </div>
 </div>
 {% endif %}
@@ -121,8 +121,10 @@
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
             {% for col in collections %}
                 <a href="{% url 'product_list' %}?collection={{ col.slug }}" class="group relative h-[480px] md:h-[560px] overflow-hidden bg-primary block">
-                    <img src="{{ col.banner_image_url }}" alt="{{ col.name }}" 
-                         class="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-105 opacity-85 group-hover:opacity-95">
+                    {% if col.banner_image_url %}
+                        <img src="{{ col.banner_image_url.url }}" alt="{{ col.name }}" 
+                             class="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-105 opacity-85 group-hover:opacity-95">
+                    {% endif %}
                     <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent"></div>
                     
                     <div class="absolute inset-x-6 bottom-8 text-white">
