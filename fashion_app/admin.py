@@ -4,9 +4,11 @@ from import_export import resources
 from import_export.admin import ImportExportModelAdmin
 from .models import (
     User, Address, Category, Collection, Color, Size,
-    Product, ProductImage, ProductVariant, Cart, CartItem,
-    Wishlist, Coupon, Order, OrderItem, Review, NewsletterSubscriber, RecentlyViewed
+    Product, ProductImage, ProductVariant, Cart, CartItem, Wishlist,
+    Coupon, Order, OrderItem, Review, NewsletterSubscriber, RecentlyViewed,
+    HomepageVideo,
 )
+
 
 
 class ProductImageInline(admin.TabularInline):
@@ -31,6 +33,15 @@ class ProductResource(resources.ModelResource):
     class Meta:
         model = Product
         fields = ('id', 'name', 'slug', 'category__name', 'gender', 'price_ngn', 'discount_price_ngn', 'is_new_arrival', 'is_best_seller')
+
+
+
+
+@admin.register(HomepageVideo)
+class HomepageVideoAdmin(admin.ModelAdmin):
+    list_display = ('title', 'is_active')
+    list_editable = ('is_active',)
+    search_fields = ('title',)
 
 
 @admin.register(Product)

@@ -71,7 +71,7 @@ class Collection(models.Model):
     slug = models.SlugField(max_length=160, unique=True, blank=True)
     tagline = models.CharField(max_length=255, blank=True, null=True)
     description = models.TextField(blank=True, null=True)
-    banner_image_url = models.CharField(max_length=500, blank=True, null=True)
+    banner_image_url = models.ImageField(upload_to='banners/', blank=True, null=True)
     is_active = models.BooleanField(default=True)
     order = models.PositiveIntegerField(default=0)
 
@@ -208,9 +208,22 @@ class Product(models.Model):
         return round(raw, 2)
 
 
+class HomepageVideo(models.Model):
+    title = models.CharField(max_length=150)
+    video_url = models.URLField(help_text='Vimeo or YouTube embed URL')
+    is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return self.title
+
+    class Meta:
+        verbose_name = 'Homepage Video'
+        verbose_name_plural = 'Homepage Videos'
+
+
 class ProductImage(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='images')
-    image_url = models.CharField(max_length=500, help_text="Image URL (CDN, Unsplash, or media storage)")
+    image_url = models.ImageField(upload_to='product_images/', blank=True, null=True, help_text="Image URL (CDN, Unsplash, or media storage)")
     alt_text = models.CharField(max_length=200, blank=True, null=True)
     is_primary = models.BooleanField(default=False)
     is_hover = models.BooleanField(default=False)

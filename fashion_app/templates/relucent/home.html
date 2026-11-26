@@ -4,6 +4,48 @@
 {% block title %}Relucent Clothing — Contemporary Luxury & Savile Row Precision{% endblock %}
 
 {% block content %}
+
+{# Carousel Section #}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" x-data="{ current: 0 }">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
+  <div class="swiper mySwiper">
+    <div class="swiper-wrapper">
+      {% for col in CAROUSEL_IMAGES %}
+      <div class="swiper-slide">
+        <img src="{{ col.banner_image_url.url }}" alt="{{ col.name }} banner" class="w-full h-64 object-cover rounded-lg" />
+        <div class="mt-2 text-center text-sm font-medium">{{ col.name }}</div>
+      </div>
+      {% empty %}
+      <div class="swiper-slide"><p class="text-center text-gray-5" >No carousel images available.</p></div>
+      {% endfor %}
+    </div>
+    <div class="swiper-pagination"></div>
+    <div class="swiper-button-prev"></div>
+    <div class="swiper-button-next"></div>
+  </div>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      new Swiper('.mySwiper', {
+        loop: true,
+        pagination: { el: '.swiper-pagination', clickable: true },
+        navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' },
+        autoplay: { delay: 5000 },
+      });
+    });
+  </script>
+</div>
+
+{# Video Section #}
+{% if HOMEPAGE_VIDEO %}
+<div class="max-w-4xl mx-auto px-4 py-8">
+  <h2 class="text-2xl font-serif text-center mb-4">{{ HOMEPAGE_VIDEO.title }}</h2>
+  <div class="aspect-w-16 aspect-h-9">
+    <iframe src="{{ HOMEPAGE_VIDEO.video_url|replace:'watch?v=','embed/' }}" title="Homepage video" allowfullscreen class="w-full h-full rounded-lg"></iframe>
+  </div>
+</div>
+{% endif %}
+
 <!-- 1. HERO SECTION (EDITORIAL LUXURY LOOKBOOK) -->
 <section class="relative min-h-[85vh] md:min-h-[92vh] flex items-center bg-primary text-white overflow-hidden">
     <!-- Hero Background Image with Subtle Parallax / Darkening Overlay -->
