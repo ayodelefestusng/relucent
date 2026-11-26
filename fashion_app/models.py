@@ -171,21 +171,21 @@ class Product(models.Model):
     @property
     def primary_image_url(self):
         primary = self.images.filter(is_primary=True).first()
-        if primary:
-            return primary.image_url
+        if primary and primary.image_url:
+            return primary.image_url.url
         first_img = self.images.first()
-        if first_img:
-            return first_img.image_url
+        if first_img and first_img.image_url:
+            return first_img.image_url.url
         return "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=800&q=80"
 
     @property
     def hover_image_url(self):
         hover = self.images.filter(is_hover=True).first()
-        if hover:
-            return hover.image_url
+        if hover and hover.image_url:
+            return hover.image_url.url
         images = list(self.images.all())
-        if len(images) > 1:
-            return images[1].image_url
+        if len(images) > 1 and images[1].image_url:
+            return images[1].image_url.url
         return self.primary_image_url
 
     def get_price(self, currency='NGN'):
